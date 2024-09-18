@@ -1,4 +1,4 @@
-from model.loader import LoadModel
+from src.model.loader import LoadModel
 import numpy as np
 
 class ApiHandler:

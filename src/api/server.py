@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from api.api_handler import ApiHandler
+from src.api.api_handler import ApiHandler
 
 app = FastAPI()
 api_handler = ApiHandler()

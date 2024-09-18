@@ -19,7 +19,7 @@ class ApiHandler:
         try:
             prediction = model.predict(features)
         except Exception as e:
-            raise RuntimeError("Erro durante a predição do modelo") from e
+            raise RuntimeError(f"Erro durante a predição do modelo {e}" )
         
         return int(prediction[0])
 

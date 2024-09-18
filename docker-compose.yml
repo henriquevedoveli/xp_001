@@ -1,0 +1,8 @@
+services:
+  xp_api:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: xp_api
+    ports:
+      - "9090:9090"

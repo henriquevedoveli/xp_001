@@ -13,7 +13,7 @@ class LoadModel:
         - load_model: Carrega e retorna o modelo
 
     """
-    def __init__(self, model_path: str = "artifacts/models/model.pkl") -> None:
+    def __init__(self, model_path: str = "/artifacts/models/model.pkl") -> None:
         """
         Iniciliaza a classe.
         

@@ -11,12 +11,8 @@ class SQliteHandler:
         """
         Inicializa a conexão com o banco de dados SQLite e cria a tabela de auditoria, se ela não existir.
         """
-        self.conn = sqlite3.connect(
-            "/sqlite/auditoria.db"
-        )  # Conecta ao banco de dados SQLite
-        self.cursor = self.conn.cursor()  # Cria o cursor para executar comandos SQL
+        self.database_conn()
 
-        # Cria a tabela 'auditoria' se ela ainda não existir
         self.cursor.execute(
             """
         CREATE TABLE IF NOT EXISTS auditoria (
@@ -40,6 +36,20 @@ class SQliteHandler:
         """
         )
 
+        self.database_commit_and_close_conn()
+
+        
+
+    def database_conn(self):
+        self.conn = sqlite3.connect(
+            "/sqlite/auditoria.db"
+        )  
+        self.cursor = self.conn.cursor()
+        
+    def database_commit_and_close_conn(self):
+        self.conn.commit() 
+        self.conn.close()
+
     def save_audit_data(self, model_name, valores, predict):
         """
         Insere os dados de auditoria no banco de dados após uma predição ser realizada.
@@ -49,7 +59,9 @@ class SQliteHandler:
         valores (list): Lista contendo os valores de entrada utilizados para a predição.
         predict (int): O valor previsto pelo modelo.
         """
-        # Insere os dados de auditoria na tabela 'auditoria'
+
+        self.database_conn()
+        
         self.cursor.execute(
             """
             INSERT INTO auditoria (
@@ -61,5 +73,4 @@ class SQliteHandler:
             (model_name, *valores, predict),
         )
 
-        self.conn.commit()  # Confirma a transação
-        self.conn.close()  # Fecha a conexão com o banco de dados
+        self.database_commit_and_close_conn()

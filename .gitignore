@@ -4,3 +4,5 @@ artifacts/
 conf/
 logs/
 sqlite/
+mlruns/
+mlartifacts/

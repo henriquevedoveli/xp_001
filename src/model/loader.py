@@ -62,12 +62,13 @@ class LoadModel:
                 "http://127.0.0.1:5000"
             )  # Define a URI do servidor MLflow
 
-            return (
-                mlflow.pyfunc.load_model(
+
+            model = mlflow.pyfunc.load_model(
                     model_uri=f"models:/{model_name}/{model_version}"
-                ),
-                model_name,
-            )
+                )
+        
+
+            return model, model_name
 
         except Exception as e:
             logging.error(f"Erro ao carregar modelo MLflow {e}")

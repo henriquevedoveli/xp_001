@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.11-bullseye 
 
 WORKDIR /xp
 
@@ -8,7 +8,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY /artifacts /artifacts
 
+COPY /conf /conf
+
 COPY src/ src/
+
 
 EXPOSE 9090
 

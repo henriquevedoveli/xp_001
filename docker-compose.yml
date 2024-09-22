@@ -4,5 +4,7 @@ services:
       context: ./
       dockerfile: Dockerfile
     container_name: xp_api
-    ports:
-      - "9090:9090"
+    volumes:
+      - ./logs:/logs
+      - ./sqlite:/sqlite
+    network_mode: "host"

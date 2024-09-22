@@ -1,6 +1,9 @@
 import pickle
 import os
+import logging
+import mlflow.pyfunc
 from typing import Any
+from src.config.config import Config
 
 class LoadModel:
     """
@@ -13,24 +16,41 @@ class LoadModel:
         - load_model: Carrega e retorna o modelo
 
     """
-    def __init__(self, model_path: str = "/artifacts/models/model.pkl") -> None:
-        """
-        Iniciliaza a classe.
+
+    def __init__(self) -> None:
+        self.config = Config().get_config()
+
+    def load_model(self, model_type:str):
+
+        if model_type == "mlflow":
+            logging.info("Usando modelo MLFlow")
+            return self.load_mlflow_model()
+
+        elif model_type == "local":
+            logging.info("Usando modelo Local")
+            return self.load_pickle_model()
         
-        Parametros:
-            - model_path (str): Caminho onde esta localizado o modelo
+        logging.error(f"Modo de inferencia {model_type} nao implementado")
+        raise ValueError(f"Modo de inferencia {model_type} nao implementado")
 
-        Retornos:
-            - None
 
-        Raises:
-            - FileNotFoundError: Erro ao nao encontrar o arquivo no model_path passado     
-        """
-        if not os.path.isfile(model_path):
-            raise FileNotFoundError(f"O caminho do modelo '{model_path}' não existe.")
-        self._model_path = model_path
+        
+    def load_mlflow_model(self):
 
-    def load_model(self) -> Any:
+        try:
+            model_name = self.config["model"]["mlflow"]["model_name"]
+            model_version = self.config["model"]["mlflow"]["model_version"]
+            logging.info(f"Carregando modelo MLflow {model_name} versao {model_version}")
+
+            mlflow.set_tracking_uri("http://127.0.0.1:5000")
+
+            return mlflow.pyfunc.load_model(model_uri=f"models:/{model_name}/{model_version}"), model_name
+        
+        except Exception as e:
+            logging.error(f"Erro ao carregar modelo MLFOW {e}")
+            return
+
+    def load_pickle_model(self, model_path) -> Any:
         """
         Carrega o modelo a partir do caminho especificado.
         
@@ -42,9 +62,16 @@ class LoadModel:
 
         Raises:
             - RuntimeError: Erro ao carregar o modelo        
-        """
+        """     
+        if not os.path.isfile(model_path):
+            logging.error(f"O arquivo {model_path} nao existe")
+            raise FileNotFoundError(f"O caminho do modelo '{model_path}' não existe.")
+        
         try:
-            with open(self._model_path, 'rb') as model:
-                return pickle.load(model)
-        except (pickle.PickleError, IOError) as e:
-            raise RuntimeError(f"Erro ao carregar o modelo: {e}")
+            with open(model_path, 'rb') as model:
+                return pickle.load(model), "local"
+            logging.info(f"Carregando modelo Local {model_path}")
+
+        except Exception as e:
+            logging.error("Erro ao carregar o modelo pickle - {e}", exc_info=True)
+            return

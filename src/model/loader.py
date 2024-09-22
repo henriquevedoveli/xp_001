@@ -5,6 +5,7 @@ import mlflow.pyfunc
 from typing import Any
 from src.config.config import Config
 
+
 class LoadModel:
     """
     Classe responsável por carregar modelos para inferência, seja de um serviço MLflow ou de um arquivo local em formato pickle.
@@ -53,11 +54,20 @@ class LoadModel:
         try:
             model_name = self.config["model"]["mlflow"]["model_name"]
             model_version = self.config["model"]["mlflow"]["model_version"]
-            logging.info(f"Carregando modelo MLflow {model_name} versão {model_version}")
+            logging.info(
+                f"Carregando modelo MLflow {model_name} versão {model_version}"
+            )
 
-            mlflow.set_tracking_uri("http://127.0.0.1:5000")  # Define a URI do servidor MLflow
+            mlflow.set_tracking_uri(
+                "http://127.0.0.1:5000"
+            )  # Define a URI do servidor MLflow
 
-            return mlflow.pyfunc.load_model(model_uri=f"models:/{model_name}/{model_version}"), model_name
+            return (
+                mlflow.pyfunc.load_model(
+                    model_uri=f"models:/{model_name}/{model_version}"
+                ),
+                model_name,
+            )
 
         except Exception as e:
             logging.error(f"Erro ao carregar modelo MLflow {e}")
@@ -82,7 +92,7 @@ class LoadModel:
             raise FileNotFoundError(f"O caminho do modelo '{model_path}' não existe.")
 
         try:
-            with open(model_path, 'rb') as model:
+            with open(model_path, "rb") as model:
                 logging.info(f"Carregando modelo Local {model_path}")
                 return pickle.load(model), "local"
 
